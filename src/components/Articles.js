@@ -51,6 +51,28 @@ componentDidMount = () => {
       })
     }
 
+    handleSort = (e) => {
+      const val = e.target.value;
+      const posts = JSON.parse(localStorage.getItem('posts'));
+      const SortedArr = val && val === 'Low to high' ?  posts.sort((a,b) => a.score - b.score) : posts.sort((a,b) => a.score - b.score).reverse();
+      this.setState({
+        posts: SortedArr
+      })
+    }
+
+     msToTime = (duration) => {
+      var milliseconds = parseInt((duration%1000)/100)
+        , seconds = parseInt((duration/1000)%60)
+        , minutes = parseInt((duration/(1000*60))%60)
+        , hours = parseInt((duration/(1000*60*60))%24);
+  
+      hours = (hours < 10) ? "0" + hours : hours;
+      minutes = (minutes < 10) ? "0" + minutes : minutes;
+      seconds = (seconds < 10) ? "0" + seconds : seconds;
+  
+      return hours + ":" + minutes + ":" + seconds;
+  }
+ 
     render() {
       const { posts, searchQuery } = this.state;
         return (
@@ -58,6 +80,14 @@ componentDidMount = () => {
               <h1>Hackernews Stories</h1>
               <form className="search-form">
                 <input type="text" onInput={this.handleInput} placeholder="Search by name" />
+              </form>
+              <form className="sort-form mt3">
+                <label>Sort by score:</label>
+                <select id="sort_by_score" name="sort_by_score" required="required" onChange={this.handleSort}>
+                    <option value="" selected="true"></option>
+                    <option value="Low to high">Low to high</option>
+                    <option value="High to low">High to low</option>
+                </select>              
               </form>
               <div className="post-grid">
               {
@@ -67,8 +97,9 @@ componentDidMount = () => {
                     <h3>{post.title}</h3>
                     <div className="post-detail-wrapper">
                       <div>Author: {post.by}</div>
-                      <div>Time: {post.time}</div>
+                      <div>Score: { post.score }</div>
                     </div>
+                    <div>Time: {this.msToTime(post.time)}</div>
                   </a>
                 ) : <div>No results found for {searchQuery}</div>
               }
